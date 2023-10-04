@@ -1,2 +1,2 @@
-# Projet_ing-nieur
+# Projet_ingénieur
 PINN - Physics Inferred Neural Network 
