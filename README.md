@@ -9,3 +9,6 @@ Ce modèle peut être simplement une courbe, une équation différentielle ordin
 - exploration d'un PINN pour un réacteur d'adsorption (production de e-fuel) simple, avec
 accélération de la convergence des résultats
 - exploration d'un PINN pour un système plus complexe
+
+Docs:
+https://cs230.stanford.edu/section/4/#xavier-initialization
