@@ -10,5 +10,6 @@ Ce modèle peut être simplement une courbe, une équation différentielle ordin
 accélération de la convergence des résultats
 - exploration d'un PINN pour un système plus complexe
 
-Docs:
-https://cs230.stanford.edu/section/4/#xavier-initialization
+Docs:  
+https://cs230.stanford.edu/section/4/#xavier-initialization  
+https://www.youtube.com/watch?v=Wfgr1pMA9fY&list=PL1e3Jic2_DwwJQ528agJYMEpA0oMaDSA9&index=14&ab_channel=MLPS-CombiningAIandMLwithPhysicsSciences
