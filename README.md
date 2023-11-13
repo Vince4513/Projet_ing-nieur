@@ -12,10 +12,10 @@ accélération de la convergence des résultats
 - Exploration d'un PINN pour un système plus complexe
 
 ### Bibliothèques utilisées
-DeepXDE (https://github.com/lululxvi/deepxde)
-gspread (https://github.com/burnash/gspread)
+DeepXDE (https://github.com/lululxvi/deepxde)  
+gspread (https://github.com/burnash/gspread)  
 
 
 ### Docs:  
-https://cs230.stanford.edu/section/4/#xavier-initialization  
-https://www.youtube.com/watch?v=Wfgr1pMA9fY&list=PL1e3Jic2_DwwJQ528agJYMEpA0oMaDSA9&index=14&ab_channel=MLPS-CombiningAIandMLwithPhysicsSciences
+Initialisation des poids du réseau: (https://cs230.stanford.edu/section/4/#xavier-initialization)   
+Video explicative DeepXDE: (https://www.youtube.com/watch?v=Wfgr1pMA9fY&list=PL1e3Jic2_DwwJQ528agJYMEpA0oMaDSA9&index=14&ab_channel=MLPS-CombiningAIandMLwithPhysicsSciences)  
