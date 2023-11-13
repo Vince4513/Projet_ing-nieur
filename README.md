@@ -1,4 +1,4 @@
-# Projet_ingénieur
+# Projet de fin d'études
 PINN - Physics-Informed Neural Network 
 
 "Physics and Data Informed Neural Networks"  
