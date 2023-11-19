@@ -7,8 +7,7 @@ Ce modèle peut être simplement une courbe, une équation différentielle ordin
 
 ### Plan d'avancement du projet
 - Exploration d'un PINN pour le fitting d'une courbe simple (exercice "scolaire")
-- Exploration d'un PINN pour un réacteur d'adsorption (production de e-fuel) simple, avec
-accélération de la convergence des résultats
+- Exploration d'un PINN pour un réacteur d'adsorption (production de e-fuel) simple, avec accélération de la convergence des résultats
 - Exploration d'un PINN pour un système plus complexe
 
 ### Bibliothèques utilisées
