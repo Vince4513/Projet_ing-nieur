@@ -1,0 +1,6 @@
+# Ignore CSV, DAT, PDF, DOCX and XLSX files
+*.csv
+*.dat
+*.pdf
+*.docx
+*.xlsx
