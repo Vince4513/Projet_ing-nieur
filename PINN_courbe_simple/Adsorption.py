@@ -6,67 +6,67 @@ from io import BytesIO
 
 from pinn import PINN
 
-params_to_search = {
-    # ["Hammersley", "LHS", "Halton", "pseudo", "Sobol", "uniform"]
-    "train_distribution": ["uniform"],
-    "num_domain": [5000],
-    "num_boundary":[5000],
-    "num_initial": [1000],
-    "num_test": [1000],
+# params_to_search = {
+#     # ["Hammersley", "LHS", "Halton", "pseudo", "Sobol", "uniform"]
+#     "train_distribution": ["uniform"],
+#     "num_domain": [5000],
+#     "num_boundary":[5000],
+#     "num_initial": [1000],
+#     "num_test": [1000],
 
-    # ["Glorot normal", "Glorot uniform", "He normal", "He uniform", "LeCun normal", "LeCun uniform", "Orthogonal", "zeros"]
-    "initializer": ["Glorot normal"],
-    # [elu, relu, gelu, selu, sigmoid, silu, sin, silu, tanh]
-    "activation": ["tanh"],
-    "nb_couches": [8],
-    "nb_neur_couche": [32],
+#     # ["Glorot normal", "Glorot uniform", "He normal", "He uniform", "LeCun normal", "LeCun uniform", "Orthogonal", "zeros"]
+#     "initializer": ["Glorot normal"],
+#     # [elu, relu, gelu, selu, sigmoid, silu, sin, silu, tanh]
+#     "activation": ["tanh"],
+#     "nb_couches": [8],
+#     "nb_neur_couche": [32],
 
-    "maxcor": [100],
-    "ftol": [0],
-    "gtol": [1e-8],
-    "maxiter": [15000],
-    "maxfun": None,
-    "maxls":  [100]
-}
+#     "maxcor": [100],
+#     "ftol": [0],
+#     "gtol": [1e-8],
+#     "maxiter": [15000],
+#     "maxfun": None,
+#     "maxls":  [100]
+# }
 
-# Choix des paramètres parmi les valeurs porposées
-current_params = {param: np.random.choice(values) if isinstance(values, list) else values for param, values in params_to_search.items()}
+# # Choix des paramètres parmi les valeurs porposées
+# current_params = {param: np.random.choice(values) if isinstance(values, list) else values for param, values in params_to_search.items()}
 
-loss_weights = [1e2, 1e2, 1e5, 1e5, 1e4, 1e4]
-loss_weights_lbfgs = [1e2, 1e2, 1e5, 1e5, 1e4, 1e4]
-
-
-
-# Create an instance of PINN 
-pinn_obj = PINN(
-    x_start = 0, 
-    x_end = 1, 
-    time_start = 0, 
-    time_end = 1, 
-    total_points = 501,
-    num_time_steps = 501,
-    save_path=""
-)
+# loss_weights = [1e2, 1e2, 1e5, 1e5, 1e4, 1e4]
+# loss_weights_lbfgs = [1e2, 1e2, 1e5, 1e5, 1e4, 1e4]
 
 
-# Run the PINN
-input, output, cs, cg, losshistory, train_state = pinn_obj.run(
-    current_params = current_params, 
-    loss_weights = loss_weights,
-    loss_weights_lbfgs = loss_weights_lbfgs,
-    iterations = 100
-)
+
+# # Create an instance of PINN 
+# pinn_obj = PINN(
+#     x_start = 0, 
+#     x_end = 1, 
+#     time_start = 0, 
+#     time_end = 1, 
+#     total_points = 501,
+#     num_time_steps = 501,
+#     save_path=""
+# )
+
+
+# # Run the PINN
+# input, output, cs, cg, losshistory, train_state = pinn_obj.run(
+#     current_params = current_params, 
+#     loss_weights = loss_weights,
+#     loss_weights_lbfgs = loss_weights_lbfgs,
+#     iterations = 100
+# )
 
 # Graphs ------------------------------------------------------------
-cs = np.load('cs.npy')
-cg = np.load('cg.npy')
+cs = np.load('/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/MODELS/2023_11_21_15_56_32_cs.npy')
+cg = np.load('/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/MODELS/2023_11_21_15_56_32_cg.npy')
 
-cs_analytical = pd.read_csv('cs_analytical.csv', header=None)
-cg_analytical = pd.read_csv('cg_analytical.csv', header=None)
+# cs_analytical = pd.read_csv('/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/MODELS/cs_analytical.csv', header=None)
+# cg_analytical = pd.read_csv('/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/MODELS/cg_analytical.csv', header=None)
 
 # Convert DataFrame to arrays
-cs_analytical = cs_analytical.values
-cg_analytical = cg_analytical.values
+# cs_analytical = cs_analytical.values
+# cg_analytical = cg_analytical.values
 x_start = 0
 x_end = 1
 time_start = 0
@@ -95,7 +95,7 @@ for timestep in range(cs.shape[1]):
     
     # Plot the water depth at the current timestep
     
-    ax.plot(x, cs_analytical[:, timestep], label='Analytical')
+    # ax.plot(x, cs_analytical[:, timestep], label='Analytical')
     ax.plot(x, cs[:, timestep], linestyle='--', label='PINN')
     
     # Fill the area between the curves
@@ -128,7 +128,7 @@ for timestep in range(cs.shape[1]):
     
 # Save the list of frames as an MP4 file
 # (adjust the file name and parameters as needed)
-mp4_filename = 'C:/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/water_depth_animation.mp4'
+mp4_filename = 'C:/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/cs_animation.mp4'
 imageio.mimsave(mp4_filename, frames, fps=10)
 
 # Show the final animation
@@ -150,7 +150,7 @@ for timestep in range(cg.shape[1]):
     
     # Plot the water depth at the current timestep
     
-    ax.plot(x, cg_analytical[:, timestep], label='Analytical')
+    # ax.plot(x, cg_analytical[:, timestep], label='Analytical')
     ax.plot(x, cg[:, timestep], linestyle='--', label='PINN')
     
     timestamp = (timestep+1) * dt
@@ -180,7 +180,7 @@ for timestep in range(cg.shape[1]):
     
 # Save the list of frames as an MP4 file
 # (adjust the file name and parameters as needed)
-mp4_filename = 'C:/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/water_velocity_animation.mp4'
+mp4_filename = 'C:/diskD/0 - POLYTECH/5A/COURS/PROJET INGE/Projet_ingenieur/cg_animation.mp4'
 imageio.mimsave(mp4_filename, frames, fps=10)
 
 # Show the final animation
