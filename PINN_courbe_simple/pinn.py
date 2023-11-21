@@ -46,10 +46,16 @@ class PINN:
     # cg: concentration prédite
     # loss_history, train_state: les résultats du modèle
     # input, output: entrées et sorties du PINN
-    def run(self, current_params, loss_weights, iterations):
+    def run(self, current_params, loss_weights, loss_weights_lbfgs, iterations):
 
         now = datetime.today()
         datetime_ = f"{now.year}_{now.month}_{now.day}_{now.hour}_{now.minute}_{now.second}"
+        
+        # Preparation of Input for Prediction using PINN -------------------------------
+        x = np.linspace(self.x_start, self.x_end, self.total_points)
+        t = np.linspace(self.time_start, self.time_end, self.num_time_steps)
+        X, T = np.meshgrid(x,t)
+        input = np.hstack((X.flatten()[:,None], T.flatten()[:,None]))
 
         # Fonction créant les équations différentielles partielles --------------------------
         def pde(z, u):
@@ -110,25 +116,32 @@ class PINN:
         #               [0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.4, 1.0, 1.0, 1.0, 1.0]]).T, component=1)
 
         data = dde.data.TimePDE(
-            geomtime, pde, [ic_cs, ic_cg, bc_cg, bc_dcg], num_domain=current_params["num_domain"], num_boundary=current_params["num_boundary"], num_initial=current_params["num_initial"]
+            geomtime, pde, [ic_cs, ic_cg, bc_cg, bc_dcg], 
+            num_domain=current_params["num_domain"], 
+            num_boundary=current_params["num_boundary"], 
+            num_initial=current_params["num_initial"], 
+            anchors=input
         )
         
         layer_size = [2] + [current_params["nb_neur_couche"]] * current_params["nb_couches"] + [2]
         net = dde.nn.FNN(layer_size, current_params["activation"], current_params["initializer"])
         model = dde.Model(data, net)
 
+        # Adam --------------------------------------------------------------------------
         model.compile("adam", lr=3e-4, loss_weights = loss_weights)
-        losshistory, train_state = model.train(iterations= iterations)
+        pde_resampler = dde.callbacks.PDEPointResampler(period=10)
+        losshistory, train_state = model.train(iterations= iterations, callbacks=[pde_resampler])
         dde.saveplot(losshistory, train_state, issave=True, isplot=True)
-        
         # Save the trained model
-        model.save(f"{self.save_path}MODELS/{datetime_}_saved_model.h5")
+        model.save(f"{self.save_path}MODELS/{datetime_}_1stStageAdamOptimized.h5")
 
-        # Preparation of Input for Prediction using PINN -------------------------------
-        x = np.linspace(self.x_start, self.x_end, self.total_points)
-        t = np.linspace(self.time_start, self.time_end, self.num_time_steps)
-        X, T = np.meshgrid(x,t)
-        input = np.hstack((X.flatten()[:,None], T.flatten()[:,None]))
+        # LBFGS --------------------------------------------------------------------------
+        dde.optimizers.set_LBFGS_options(maxiter= 100, gtol= 1e-5)
+        model.compile("L-BFGS", loss_weights = loss_weights_lbfgs)    
+        losshistory, train_state = model.train(callbacks=[pde_resampler])
+        dde.saveplot(losshistory, train_state, issave=True, isplot=True)
+        # Save the trained model
+        model.save(f"{self.save_path}MODELS/{datetime_}_2ndStage_LBFGS_Optimzed.h5")
 
         ### Post Processing ------------------------------------------------------------
         output = model.predict(input) #passing the input gridpoints and timestamps through optimized neural network
@@ -140,4 +153,4 @@ class PINN:
         np.save(f"{self.save_path}MODELS/{datetime_}_cs.npy", cs)
         np.save(f"{self.save_path}MODELS/{datetime_}_cg.npy", cg)
         
-        return input, output, cs, cg, losshistory, train_state
+        return losshistory, train_state
