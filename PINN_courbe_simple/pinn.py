@@ -29,7 +29,6 @@ class PINN:
         
         self.L_scale = x_end - x_start         # longueur du lit
         self.T_scale = time_end - time_start   # durée expérience
-        self.U_scale = 3 #put tentative maximum value you think is appropriate in m/s
 
         #Scaling the variables 
         self.x_start = x_start/ self.L_scale
@@ -72,8 +71,8 @@ class PINN:
 
             # eq1 = (dcg_dt + ug * dcg_dz) + (kg*as_/epsb) * (cg-cs/Ke)
             # eq2 = dcs_dt - (kg*as_/(1-epsb)) * (cg-cs/Ke)
-            eq1 = (((self.L_scale * dcg_dt) / (self.T_scale * self.U_scale)) + self.ug * dcg_dz) + (self.kg*self.as_/self.epsb) * (10*cg - cs)/10
-            eq2 = ((self.L_scale * dcs_dt) / (self.T_scale * self.U_scale)) - (self.kg*self.as_/(1-self.epsb)) * (10*cg - cs)/10
+            eq1 = (((self.L_scale * dcg_dt) / (self.T_scale)) + self.ug * dcg_dz) + (self.kg*self.as_/self.epsb) * (10*cg - cs)/10
+            eq2 = ((self.L_scale * dcs_dt) / (self.T_scale)) - (self.kg*self.as_/(1-self.epsb)) * (10*cg - cs)/10
 
             return [eq1, eq2]
 
@@ -128,10 +127,10 @@ class PINN:
         model = dde.Model(data, net)
 
         # Adam --------------------------------------------------------------------------
-        model.compile("adam", lr=3e-4, loss_weights = loss_weights)
+        model.compile("adam", lr=5e-4, loss_weights = loss_weights)
         pde_resampler = dde.callbacks.PDEPointResampler(period=10)
         losshistory, train_state = model.train(iterations= iterations, callbacks=[pde_resampler])
-        dde.saveplot(losshistory, train_state, issave=True, isplot=True)
+        dde.saveplot(losshistory, train_state, issave=True)
         # Save the trained model
         model.save(f"{self.save_path}MODELS/{datetime_}_1stStageAdamOptimized.h5")
 
@@ -139,16 +138,16 @@ class PINN:
         dde.optimizers.set_LBFGS_options(maxiter= 100, gtol= 1e-5)
         model.compile("L-BFGS", loss_weights = loss_weights_lbfgs)    
         losshistory, train_state = model.train(callbacks=[pde_resampler])
-        dde.saveplot(losshistory, train_state, issave=True, isplot=True)
+        dde.saveplot(losshistory, train_state, issave=True)
         # Save the trained model
         model.save(f"{self.save_path}MODELS/{datetime_}_2ndStage_LBFGS_Optimzed.h5")
 
         ### Post Processing ------------------------------------------------------------
         output = model.predict(input) #passing the input gridpoints and timestamps through optimized neural network
     
-        # Extracting water depth 'cs' and velocity 'cg' from the result ------------------
+        # Extracting concentration 'cs' and concentration 'cg' from the result ------------------
         cs = (output[:, 0].reshape((-1, self.total_points)).T)
-        cg = (output[:, 1].reshape((-1, self.total_points)).T) * self.U_scale
+        cg = (output[:, 1].reshape((-1, self.total_points)).T)
 
         np.save(f"{self.save_path}MODELS/{datetime_}_cs.npy", cs)
         np.save(f"{self.save_path}MODELS/{datetime_}_cg.npy", cg)
